@@ -13,7 +13,8 @@
     "build:client": "vite build",
     "build:server": "tsup --tsconfig tsconfig.server.json",
     "build": "npm run build:client && npm run build:server",
-    "prepare": "husky"
+    "prepare": "husky",
+    "patch": "npm version patch && git push --follow-tags"
   },
   "keywords": [
     "react",
@@ -23,7 +24,7 @@
   ],
   "author": "Miguel Quintal <mquintal88@gmail.com>",
   "license": "ISC",
-  "description": "",
+  "description": "Simplifies the use of MDX files on a React Router v7 project.",
   "peerDependencies": {
     "@react-router/dev": "^7.6.2",
     "react": "^19.1.0",
@@ -31,7 +32,6 @@
     "react-router": "^7.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.4",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@jest/globals": "^29.7.0",
@@ -44,7 +44,6 @@
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react": "^4.5.0",
-    "babel-jest": "^30.0.0-beta.3",
     "cross-env": "^7.0.3",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
@@ -60,7 +59,6 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.6.2",
-    "react-test-renderer": "^19.1.0",
     "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2",
     "tsc": "^2.0.4",

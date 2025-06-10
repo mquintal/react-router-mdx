@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2020",
+    "moduleResolution": "bundler",
+    "outDir": "dist/server",
+    "declaration": true,
+    "paths": {
+      "@react-router/dev/routes": ["./nodes_modules/@react-router/dev/dist/routes"]
+    },
+  },
+  "include": ["./src/server"]
+}

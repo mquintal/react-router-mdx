@@ -1,3 +1,3 @@
 export { useMdxComponent } from './useMdxComponent'
-export { useMdxMetadata } from './useMdxMetadata'
+export { useMdxAttributes } from './useMdxAttributes'
 export { useMdxFiles } from './useMdxFiles'

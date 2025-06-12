@@ -1,4 +1,4 @@
-# react-router-mdx
+# react-router-mdx [![npm version](https://img.shields.io/npm/v/react-router-mdx)](https://www.npmjs.com/package/react-router-mdx)
 
 > Simplifies the use of MDX files on a [React Router v7](https://reactrouter.com/home) project.
 
@@ -60,7 +60,6 @@ Here we are appending the routes based on your MDX files to your project's route
 import { index } from "@react-router/dev/routes";
 import { routes } from 'react-router-mdx/server'
 
-
 export default [
     index("routes/home.tsx"),
     ...routes("./routes/post.tsx")
@@ -74,12 +73,11 @@ import { useMdxComponent, useMdxAttributes } from 'react-router-mdx/client'
 import { loadMdx } from 'react-router-mdx/server'
 import type { Route } from "./+types/post";
 
-
 export async function loader({ request }: Route.LoaderArgs) {
   return loadMdx(request)
 }
 
-export default function Routess() {
+export default function Route() {
   const Component = useMdxComponent()
   const attributes = useMdxAttributes()
 
@@ -110,5 +108,46 @@ export function meta({ data: { attributes } }: Route.MetaArgs) {
       content: attributes.title,
     },
   ]
+}
+```
+
+## Using custom components
+
+If you need to extend the MDX base components you can use your custom components by passing an components object to `useMdxComponent`.
+
+Let's assume you want to embed YouTube videos in your MDX files. For that you can create an custom `Youtube` component that will render the you embed HTML code by providing just the video ID.
+
+`hello-world.mdx`
+```mdx
+---
+title: hello world title
+---
+# hello world
+
+This is a hello World mdx file
+
+<YouTube id='SOME-VIDEO-ID' >
+```
+
+`app/routes/posts.tsx`
+```ts
+const components = {
+  YouTube: ({ id }: { id: string }) => {
+    return (
+      <iframe width="560" height="315" src={`https://www.youtube.com/embed/${id}`} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen />
+    )
+  }
+}
+
+export default function Route() {
+  const Component = useMdxComponent(components)
+  const attributes = useMdxAttributes()
+
+  return (
+    <section>
+      <h1>{attributes.title}<h1>
+      <Component />
+    </section>
+  )
 }
 ```

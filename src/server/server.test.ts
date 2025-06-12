@@ -177,9 +177,7 @@ describe('loadMdx', () => {
   })
 
   it('should load the mdx file based on the request path provided', async () => {
-    const { getFileContent, compileMdx, getMdxAttributes, convertMdxToHTML } = await import(
-      './utils'
-    )
+    const { getFileContent, compileMdx, getMdxAttributes } = await import('./utils')
     const { loadMdx } = await import('./server')
 
     const path = 'posts/path-a'
@@ -191,16 +189,13 @@ describe('loadMdx', () => {
     jest.mocked(getFileContent).mockResolvedValue(mdxContent)
     jest.mocked(compileMdx).mockResolvedValue(mdxCompiled)
     jest.mocked(getMdxAttributes).mockReturnValue(mdxAttributes)
-    jest.mocked(convertMdxToHTML).mockResolvedValue(html)
 
-    const mdx = await loadMdx(new Request(`https://some.domain/${path}`), undefined)
+    const mdx = await loadMdx(new Request(`https://some.domain/${path}`))
     expect(getFileContent).toHaveBeenCalledWith(expect.stringContaining(`${path}.mdx`))
     expect(compileMdx).toHaveBeenCalledWith(mdxContent)
     expect(getMdxAttributes).toHaveBeenCalledWith(mdxContent)
-    expect(convertMdxToHTML).toHaveBeenCalledWith(mdxCompiled, undefined, mdxAttributes)
     expect(mdx).toEqual({
-      raw: mdxCompiled,
-      html: html,
+      __raw: mdxCompiled,
       attributes: mdxAttributes,
     })
   })
@@ -209,7 +204,7 @@ describe('loadMdx', () => {
     const { loadMdx } = await import('./server')
     const url = 'https://some.domain/some-path-does-not-exist'
 
-    expect(() => loadMdx(new Request(url), undefined)).rejects.toThrowError(
+    expect(() => loadMdx(new Request(url))).rejects.toThrowError(
       `Path "posts" is not found on "${url}" url.`
     )
   })
@@ -223,7 +218,7 @@ describe('loadMdx', () => {
       throw new Error('something went wrong')
     })
 
-    expect(() => loadMdx(new Request(url), undefined)).rejects.toThrowError('something went wrong')
+    expect(() => loadMdx(new Request(url))).rejects.toThrowError('something went wrong')
   })
 
   it('should reject when it could not compile mdx file', async () => {
@@ -236,15 +231,13 @@ describe('loadMdx', () => {
       throw new Error('something went wrong while compiling mdx')
     })
 
-    expect(() => loadMdx(new Request(url), undefined)).rejects.toThrowError(
+    expect(() => loadMdx(new Request(url))).rejects.toThrowError(
       'something went wrong while compiling mdx'
     )
   })
 
   it('should reject when it could not extract mdx file attributes', async () => {
-    const { getFileContent, compileMdx, getMdxAttributes, convertMdxToHTML } = await import(
-      './utils'
-    )
+    const { getFileContent, compileMdx, getMdxAttributes } = await import('./utils')
     const { loadMdx } = await import('./server')
     const url = 'https://some.domain/posts/some-file'
 
@@ -254,28 +247,8 @@ describe('loadMdx', () => {
       throw new Error('something went wrong while extracting mdx attributes')
     })
 
-    expect(() => loadMdx(new Request(url), undefined)).rejects.toThrowError(
+    expect(() => loadMdx(new Request(url))).rejects.toThrowError(
       'something went wrong while extracting mdx attributes'
-    )
-    expect(convertMdxToHTML).toHaveBeenCalledTimes(0)
-  })
-
-  it('should reject when it could not convert mdx to html', async () => {
-    const { getFileContent, compileMdx, getMdxAttributes, convertMdxToHTML } = await import(
-      './utils'
-    )
-    const { loadMdx } = await import('./server')
-    const url = 'https://some.domain/posts/some-file'
-
-    jest.mocked(getFileContent).mockResolvedValue('some content')
-    jest.mocked(compileMdx).mockResolvedValue('some compiled content')
-    jest.mocked(getMdxAttributes).mockReturnValue({ some: 'value' })
-    jest.mocked(convertMdxToHTML).mockImplementation(() => {
-      throw new Error('something went wrong while converting to html')
-    })
-
-    expect(() => loadMdx(new Request(url), undefined)).rejects.toThrowError(
-      'something went wrong while converting to html'
     )
   })
 })

@@ -1,5 +1,4 @@
 export type LoadData = {
-  html: string
-  raw: string
+  __raw: string
   attributes: Record<string, string>
 }

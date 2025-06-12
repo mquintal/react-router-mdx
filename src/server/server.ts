@@ -1,6 +1,5 @@
 import { route } from '@react-router/dev/routes'
 import {
-  convertMdxToHTML,
   getMdxAttributes,
   getFilePathBasedOnUrl,
   compileMdx,
@@ -9,7 +8,7 @@ import {
   getFileContent,
   listMdxFilesSync,
 } from './utils'
-import type { MDXComponents, Options } from './types'
+import type { Options } from './types'
 import { getOptions, setOptions } from './options'
 
 export function init(options: Options) {
@@ -51,7 +50,7 @@ export const routes = (componentPath: string) => {
   })
 }
 
-export const loadMdx = async (request: Request, components: MDXComponents) => {
+export const loadMdx = async (request: Request) => {
   const options = getOptions()
   const path = getFilePathBasedOnUrl(request.url, options.path, options.alias)
   const content = await getFileContent(path)
@@ -61,8 +60,7 @@ export const loadMdx = async (request: Request, components: MDXComponents) => {
   ])
 
   return {
-    raw: mdxContent,
-    html: await convertMdxToHTML(mdxContent, components, attributes),
+    __raw: mdxContent,
     attributes,
   }
 }

@@ -2,16 +2,11 @@ import { readFile } from 'fs/promises'
 import { glob, globSync } from 'glob'
 import matter from 'gray-matter'
 import { resolve, join } from 'path'
-import * as runtime from 'react/jsx-runtime'
-import { renderToString } from 'react-dom/server'
-import React from 'react'
 import slash from 'slash'
-import { compile, run } from '@mdx-js/mdx'
+import { compile } from '@mdx-js/mdx'
 import remarkFrontmatter from 'remark-frontmatter'
-import type { MDXComponents } from './types'
 
 export const listMdxFiles = (path: string) => {
-  console.log('>>')
   return glob(resolve(process.cwd(), path, '**', '*.mdx'))
 }
 
@@ -52,14 +47,4 @@ export const compileMdx = async (mdxContent: string) => {
   })
 
   return String(compiled)
-}
-
-export const convertMdxToHTML = async (
-  mdxContent: string,
-  components: MDXComponents,
-  metadata: Record<string, string>
-) => {
-  const { default: MDXContent } = await run(mdxContent, { ...runtime })
-
-  return renderToString(React.createElement(MDXContent, { components, ...metadata }))
 }

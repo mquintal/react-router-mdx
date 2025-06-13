@@ -8,7 +8,7 @@ type MDXContent = ReturnType<typeof runSync>['default']
 type MDXProps = Parameters<MDXContent>[0]
 type MDXComponents = MDXProps['components']
 
-export const useMdxComponent = <T extends MDXComponents>(components: T) => {
+export const useMdxComponent = <T extends MDXComponents>(components?: T) => {
   const { attributes, __raw } = useLoaderData<LoadData>()
   const { default: Component } = runSync(__raw, { ...runtime, baseUrl: import.meta.url })
 

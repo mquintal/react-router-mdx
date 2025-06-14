@@ -1,0 +1,45 @@
+name: Deploy Demo
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    defaults:
+      run:
+        working-directory: demo 
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install demo dependencies
+        run: yarn --immutable
+
+      - name: Build demo
+        run: yarn build
+
+      - name: Configure Git user
+        run: |
+          git config --global user.name "Miguel Quintal"
+          git config --global user.email "mquintal88@gmail.com"
+      
+
+      - name: Deploy to GitHub Pages
+        run: yarn deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

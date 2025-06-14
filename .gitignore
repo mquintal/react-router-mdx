@@ -1,0 +1,9 @@
+dist
+node_modules
+.vscode
+.yarn
+
+# demo
+demo/.react-router
+demo/node_modules/
+demo/build

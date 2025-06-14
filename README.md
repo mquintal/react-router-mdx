@@ -4,6 +4,8 @@
 
 It was designed to integrate with [React Router v7](https://reactrouter.com/home) while using [Static Pre-rendering](https://reactrouter.com/start/framework/rendering#static-pre-rendering). Allowing you generate content based on a list of MDX files from a given folder.
 
+Check our [DEMO](https://react-router-mdx.netlify.app/)
+
 ## Install
 
 npm

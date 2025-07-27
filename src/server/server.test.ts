@@ -19,7 +19,9 @@ describe('init().path', () => {
     const { listMdxFiles } = await import('./utils')
     const { init } = await import('./server')
 
-    jest.mocked(listMdxFiles).mockResolvedValue(['posts/some-file-a.mdx', 'posts/some-file-b.mdx'])
+    jest
+      .mocked(listMdxFiles)
+      .mockResolvedValue([['posts/some-file-a.mdx', 'posts/some-file-b.mdx']])
 
     expect(await init({ path: 'posts' }).paths()).toEqual([
       'posts/some-file-a',
@@ -40,7 +42,9 @@ describe('init().path', () => {
     const { listMdxFiles } = await import('./utils')
     const { init } = await import('./server')
 
-    jest.mocked(listMdxFiles).mockResolvedValue(['posts/some-file-a.mdx', 'posts/some-file-b.mdx'])
+    jest
+      .mocked(listMdxFiles)
+      .mockResolvedValue([['posts/some-file-a.mdx', 'posts/some-file-b.mdx']])
 
     expect(await init({ path: 'posts', alias: 'some-alias' }).paths()).toEqual([
       'some-alias/some-file-a',
@@ -75,7 +79,9 @@ describe('routesAsync', () => {
   it('should return the expected routes', async () => {
     const { listMdxFiles } = await import('./utils')
     const { routesAsync } = await import('./server')
-    jest.mocked(listMdxFiles).mockResolvedValue(['posts/some-file-a.mdx', 'posts/some-file-b.mdx'])
+    jest
+      .mocked(listMdxFiles)
+      .mockResolvedValue([['posts/some-file-a.mdx', 'posts/some-file-b.mdx']])
 
     expect(await routesAsync('./path/to/component.tsx')).toEqual([
       expect.objectContaining({
@@ -128,7 +134,7 @@ describe('routes', () => {
     const { routes } = await import('./server')
     jest
       .mocked(listMdxFilesSync)
-      .mockReturnValue(['posts/some-file-a.mdx', 'posts/some-file-b.mdx'])
+      .mockReturnValue([['posts/some-file-a.mdx', 'posts/some-file-b.mdx']])
 
     expect(routes('./path/to/component.tsx')).toEqual([
       expect.objectContaining({
@@ -205,7 +211,7 @@ describe('loadMdx', () => {
     const url = 'https://some.domain/some-path-does-not-exist'
 
     expect(() => loadMdx(new Request(url))).rejects.toThrowError(
-      `Path "posts" is not found on "${url}" url.`
+      `Path(s) posts were not found on "${url}" url.`
     )
   })
 
@@ -254,6 +260,11 @@ describe('loadMdx', () => {
 })
 
 describe('loadAllMdx', () => {
+  beforeEach(async () => {
+    const { init } = await import('./server')
+    init({ path: 'posts' })
+  })
+
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -264,7 +275,7 @@ describe('loadAllMdx', () => {
     const files = ['posts/some-file-a.mdx', 'posts/some-file-b.mdx']
     const attrs = { some: 'value' }
 
-    jest.mocked(listMdxFiles).mockResolvedValue(files)
+    jest.mocked(listMdxFiles).mockResolvedValue([files])
     jest.mocked(getFileContent).mockResolvedValue('some content')
     jest.mocked(getMdxAttributes).mockReturnValue(attrs)
 
@@ -280,7 +291,9 @@ describe('loadAllMdx', () => {
   it('should reject when it could not read the mdx file', async () => {
     const { getFileContent, listMdxFiles } = await import('./utils')
     const { loadAllMdx } = await import('./server')
-    jest.mocked(listMdxFiles).mockResolvedValue(['posts/some-file-a.mdx', 'posts/some-file-b.mdx'])
+    jest
+      .mocked(listMdxFiles)
+      .mockResolvedValue([['posts/some-file-a.mdx', 'posts/some-file-b.mdx']])
     jest.mocked(getFileContent).mockImplementation(() => {
       throw new Error('something went wrong')
     })
@@ -292,7 +305,9 @@ describe('loadAllMdx', () => {
     const { getFileContent, getMdxAttributes, listMdxFiles } = await import('./utils')
     const { loadAllMdx } = await import('./server')
 
-    jest.mocked(listMdxFiles).mockResolvedValue(['posts/some-file-a.mdx', 'posts/some-file-b.mdx'])
+    jest
+      .mocked(listMdxFiles)
+      .mockResolvedValue([['posts/some-file-a.mdx', 'posts/some-file-b.mdx']])
     jest.mocked(getFileContent).mockResolvedValue('some content')
     jest.mocked(getMdxAttributes).mockImplementation(() => {
       throw new Error('something went wrong while extracting mdx attributes')

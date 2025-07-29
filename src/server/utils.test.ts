@@ -32,32 +32,34 @@ describe('transformFilePathToUrlPath', () => {
 
 describe('getFilePathBasedOnUrl', () => {
   it('should return the expected file path when no alias is provided', () => {
-    expect(getFilePathBasedOnUrl('https://some.url/posts/some-slug', 'posts')).toContain(
+    expect(getFilePathBasedOnUrl('https://some.url/posts/some-slug', ['posts'])).toContain(
       'react-router-mdx/posts/some-slug.mdx'
     )
   })
 
   it('should return the expected file path when an alias is provided', () => {
     expect(
-      getFilePathBasedOnUrl('https://some.url/some-alias/some-slug', 'posts', 'some-alias')
+      getFilePathBasedOnUrl('https://some.url/some-alias/some-slug', ['posts'], ['some-alias'])
     ).toContain('react-router-mdx/posts/some-slug.mdx')
   })
 
   it('should throw an exception whrn an incorrect path is provided', () => {
     expect(() =>
-      getFilePathBasedOnUrl('https://some.url/posts/some-slug', 'some-incorrect-path')
-    ).toThrow('Path "some-incorrect-path" is not found on "https://some.url/posts/some-slug" url.')
+      getFilePathBasedOnUrl('https://some.url/posts/some-slug', ['some-incorrect-path'])
+    ).toThrow(
+      'Path(s) some-incorrect-path were not found on "https://some.url/posts/some-slug" url.'
+    )
   })
 
   it('should throw an exception whrn an incorrect alias is provided', () => {
     expect(() =>
       getFilePathBasedOnUrl(
         'https://some.url/some-alias/some-slug',
-        'posts',
-        'some-incorrect-alias'
+        ['posts'],
+        ['some-incorrect-alias']
       )
     ).toThrow(
-      'Path "some-incorrect-alias" is not found on "https://some.url/some-alias/some-slug" url.'
+      'Path(s) some-incorrect-alias were not found on "https://some.url/some-alias/some-slug" url.'
     )
   })
 })

@@ -6,12 +6,16 @@ import slash from 'slash'
 import { compile } from '@mdx-js/mdx'
 import remarkFrontmatter from 'remark-frontmatter'
 
-export const listMdxFiles = (path: string) => {
-  return glob(resolve(process.cwd(), path, '**', '*.mdx'))
+export const listMdxFiles = (paths: string[]) => {
+  const allFilesPromises = paths.map(async (path: string) => {
+    return glob(resolve(process.cwd(), path, '**', '*.mdx'))
+  })
+
+  return Promise.all(allFilesPromises)
 }
 
-export const listMdxFilesSync = (path: string) => {
-  return globSync(resolve(process.cwd(), path, '**', '*.mdx'))
+export const listMdxFilesSync = (paths: string[]) => {
+  return paths.map(path => globSync(resolve(process.cwd(), path, '**', '*.mdx')))
 }
 
 export const transformFilePathToUrlPath = (filePath: string, path: string, alias?: string) => {
@@ -24,12 +28,18 @@ export const transformFilePathToUrlPath = (filePath: string, path: string, alias
   throw new Error(`Path "${path}" is not found on "${filePath}" file path.`)
 }
 
-export const getFilePathBasedOnUrl = (url: string, path: string, alias?: string) => {
-  const [, slug] = url.split(`/${alias ?? path}/`)
-  if (slug) {
-    return resolve(process.cwd(), path, `${slug}.mdx`)
+export const getFilePathBasedOnUrl = (url: string, paths: string[], aliases?: string[]) => {
+  const finalPaths = paths.map((path, index) => aliases?.[index] ?? path)
+  const foundPath = finalPaths.find(path => url.includes(`/${path}/`))
+  const foundPathIndex = finalPaths.findIndex(path => url.includes(`/${path}/`))
+
+  if (foundPath) {
+    const [, slug] = url.split(`/${foundPath}/`)
+    if (slug) {
+      return resolve(process.cwd(), paths[foundPathIndex], `${slug}.mdx`)
+    }
   }
-  throw new Error(`Path "${alias ?? path}" is not found on "${url}" url.`)
+  throw new Error(`Path(s) ${finalPaths.join(', ')} were not found on "${url}" url.`)
 }
 
 export const getMdxAttributes = (content: string) => {

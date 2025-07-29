@@ -1,7 +1,7 @@
 {
   "name": "react-router-mdx",
   "type": "module",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "./dist/server/index.cjs",
   "module": "./dist/server/index.js",
   "scripts": {

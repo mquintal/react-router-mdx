@@ -8,14 +8,16 @@ import remarkFrontmatter from 'remark-frontmatter'
 
 export const listMdxFiles = (paths: string[]) => {
   const allFilesPromises = paths.map(async (path: string) => {
-    return glob(resolve(process.cwd(), path, '**', '*.mdx'))
+    return glob(resolve(process.cwd(), path, '**', '*.mdx'), { windowsPathsNoEscape: true })
   })
 
   return Promise.all(allFilesPromises)
 }
 
 export const listMdxFilesSync = (paths: string[]) => {
-  return paths.map(path => globSync(resolve(process.cwd(), path, '**', '*.mdx')))
+  return paths.map(path =>
+    globSync(resolve(process.cwd(), path, '**', '*.mdx'), { windowsPathsNoEscape: true })
+  )
 }
 
 export const transformFilePathToUrlPath = (filePath: string, path: string, alias?: string) => {

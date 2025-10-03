@@ -1,7 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { transformFilePathToUrlPath, getFilePathBasedOnUrl, compileMdx } from './utils'
-
-const removeTabs = (str: string) => str.replace(/[ ]{2}/g, '')
+import { transformFilePathToUrlPath, getFilePathBasedOnUrl } from './utils'
 
 describe('transformFilePathToUrlPath', () => {
   it('should return the expected url path when no alias is provided', async () => {
@@ -61,22 +59,5 @@ describe('getFilePathBasedOnUrl', () => {
     ).toThrow(
       'Path(s) some-incorrect-alias were not found on "https://some.url/some-alias/some-slug" url.'
     )
-  })
-})
-
-describe('readMdxFile', () => {
-  it('should return the expected outcome when there are no attributes', async () => {
-    expect(await compileMdx(JSON.stringify(`# this is a title`))).toContain('this is a title')
-  })
-
-  it('should return the expected outcome when there are attributes and custom components', async () => {
-    const mdx = removeTabs(`---
-          title: this is a page title
-          description: this is an amazing mdx file
-          ---
-          # this is a title
-          <ThisIsACustomComponent its='prop' />
-          `)
-    expect(await compileMdx(mdx)).toContain('this is a title')
   })
 })

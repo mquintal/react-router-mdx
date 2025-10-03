@@ -1,8 +1,6 @@
 import { route } from '@react-router/dev/routes'
 import {
-  getMdxAttributes,
   getFilePathBasedOnUrl,
-  compileMdx,
   listMdxFiles,
   transformFilePathToUrlPath,
   getFileContent,
@@ -10,6 +8,7 @@ import {
 } from './utils'
 import type { Options } from './types'
 import { getOptions, setOptions } from './options'
+import { compile, getAttributes } from './mdx'
 
 const getAliases = (options: Options) => {
   if ('alias' in options && options.alias) {
@@ -79,15 +78,23 @@ export const routes = (componentPath: string) => {
   })
 }
 
-export const loadMdx = async (request: Request) => {
-  const options = getOptions()
-  const paths = getPaths(options)
-  const aliases = getAliases(options)
+/**
+ *
+ * @param request - Incoming request object.
+ *   See the MDN documentation for the Request interface:
+ *   {@link https://developer.mozilla.org/en-US/docs/Web/API/Request | Request on MDN}
+ * @param options - Options to extends the mdx compile method. It accepts recmaPlugins, rehypePlugins, remarkPlugins and remarkRehypeOptions.
+ *   See the @mdx-js/mdx documentation for the compile options:
+ *   {@link https://mdxjs.com/packages/mdx/#fields}
+ */
+export const loadMdx = async (request: Request, options?: Parameters<typeof compile>['1']) => {
+  const paths = getPaths(getOptions())
+  const aliases = getAliases(getOptions())
   const path = getFilePathBasedOnUrl(request.url, paths, aliases)
   const content = await getFileContent(path)
   const [mdxContent, attributes] = await Promise.all([
-    compileMdx(content),
-    getMdxAttributes(content),
+    compile(content, options),
+    getAttributes(content),
   ])
 
   return {
@@ -114,9 +121,9 @@ export const loadAllMdx = async (filterByPaths?: string[]) => {
     pathsFiles.flatMap(pathFiles => {
       return pathFiles.map(async path => {
         const content = await getFileContent(path)
-        const attributes = getMdxAttributes(content)
+        const attributes = getAttributes(content)
         const [fileName] = path.split('/').reverse()
-        console.log('content ', content, 'attributes ', attributes, 'fileName ', fileName)
+
         return {
           path,
           slug: fileName.replace('.mdx', ''),

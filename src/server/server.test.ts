@@ -1,14 +1,19 @@
 import { describe, expect, it, jest } from '@jest/globals'
 import * as utils from './utils'
+import * as mdx from './mdx'
 
 jest.unstable_mockModule('./utils', async () => ({
   ...utils,
   listMdxFiles: jest.fn(),
   listMdxFilesSync: jest.fn(),
   getFileContent: jest.fn(),
-  compileMdx: jest.fn(),
-  getMdxAttributes: jest.fn(),
   convertMdxToHTML: jest.fn(),
+}))
+
+jest.unstable_mockModule('./mdx', async () => ({
+  ...mdx,
+  compile: jest.fn(),
+  getAttributes: jest.fn(),
 }))
 
 describe('init().path', () => {
@@ -183,7 +188,8 @@ describe('loadMdx', () => {
   })
 
   it('should load the mdx file based on the request path provided', async () => {
-    const { getFileContent, compileMdx, getMdxAttributes } = await import('./utils')
+    const { getFileContent } = await import('./utils')
+    const { compile, getAttributes } = await import('./mdx')
     const { loadMdx } = await import('./server')
 
     const path = 'posts/path-a'
@@ -193,13 +199,13 @@ describe('loadMdx', () => {
     const html = '<p>compiled html<p>'
 
     jest.mocked(getFileContent).mockResolvedValue(mdxContent)
-    jest.mocked(compileMdx).mockResolvedValue(mdxCompiled)
-    jest.mocked(getMdxAttributes).mockReturnValue(mdxAttributes)
+    jest.mocked(compile).mockResolvedValue(mdxCompiled)
+    jest.mocked(getAttributes).mockReturnValue(mdxAttributes)
 
     const mdx = await loadMdx(new Request(`https://some.domain/${path}`))
     expect(getFileContent).toHaveBeenCalledWith(expect.stringContaining(`${path}.mdx`))
-    expect(compileMdx).toHaveBeenCalledWith(mdxContent)
-    expect(getMdxAttributes).toHaveBeenCalledWith(mdxContent)
+    expect(compile).toHaveBeenCalledWith(mdxContent, undefined)
+    expect(getAttributes).toHaveBeenCalledWith(mdxContent)
     expect(mdx).toEqual({
       __raw: mdxCompiled,
       attributes: mdxAttributes,
@@ -228,12 +234,13 @@ describe('loadMdx', () => {
   })
 
   it('should reject when it could not compile mdx file', async () => {
-    const { getFileContent, compileMdx } = await import('./utils')
+    const { getFileContent } = await import('./utils')
+    const { compile } = await import('./mdx')
     const { loadMdx } = await import('./server')
     const url = 'https://some.domain/posts/some-file'
 
     jest.mocked(getFileContent).mockResolvedValue('some content')
-    jest.mocked(compileMdx).mockImplementation(() => {
+    jest.mocked(compile).mockImplementation(() => {
       throw new Error('something went wrong while compiling mdx')
     })
 
@@ -243,13 +250,14 @@ describe('loadMdx', () => {
   })
 
   it('should reject when it could not extract mdx file attributes', async () => {
-    const { getFileContent, compileMdx, getMdxAttributes } = await import('./utils')
+    const { getFileContent } = await import('./utils')
+    const { getAttributes, compile } = await import('./mdx')
     const { loadMdx } = await import('./server')
     const url = 'https://some.domain/posts/some-file'
 
     jest.mocked(getFileContent).mockResolvedValue('some content')
-    jest.mocked(compileMdx).mockResolvedValue('some compiled content')
-    jest.mocked(getMdxAttributes).mockImplementation(() => {
+    jest.mocked(compile).mockResolvedValue('some compiled content')
+    jest.mocked(getAttributes).mockImplementation(() => {
       throw new Error('something went wrong while extracting mdx attributes')
     })
 
@@ -270,14 +278,15 @@ describe('loadAllMdx', () => {
   })
 
   it('shoud list all existing mdx files', async () => {
-    const { listMdxFiles, getFileContent, getMdxAttributes } = await import('./utils')
+    const { listMdxFiles, getFileContent } = await import('./utils')
+    const { getAttributes } = await import('./mdx')
     const { loadAllMdx } = await import('./server')
     const files = ['posts/some-file-a.mdx', 'posts/some-file-b.mdx']
     const attrs = { some: 'value' }
 
     jest.mocked(listMdxFiles).mockResolvedValue([files])
     jest.mocked(getFileContent).mockResolvedValue('some content')
-    jest.mocked(getMdxAttributes).mockReturnValue(attrs)
+    jest.mocked(getAttributes).mockReturnValue(attrs)
 
     expect(await loadAllMdx()).toEqual(
       files.map(path => ({
@@ -302,14 +311,15 @@ describe('loadAllMdx', () => {
   })
 
   it('should reject when it could not extract mdx file attributes', async () => {
-    const { getFileContent, getMdxAttributes, listMdxFiles } = await import('./utils')
+    const { getFileContent, listMdxFiles } = await import('./utils')
+    const { getAttributes } = await import('./mdx')
     const { loadAllMdx } = await import('./server')
 
     jest
       .mocked(listMdxFiles)
       .mockResolvedValue([['posts/some-file-a.mdx', 'posts/some-file-b.mdx']])
     jest.mocked(getFileContent).mockResolvedValue('some content')
-    jest.mocked(getMdxAttributes).mockImplementation(() => {
+    jest.mocked(getAttributes).mockImplementation(() => {
       throw new Error('something went wrong while extracting mdx attributes')
     })
 

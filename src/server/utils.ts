@@ -1,10 +1,7 @@
 import { readFile } from 'fs/promises'
 import { glob, globSync } from 'glob'
-import matter from 'gray-matter'
 import { resolve, join } from 'path'
 import slash from 'slash'
-import { compile } from '@mdx-js/mdx'
-import remarkFrontmatter from 'remark-frontmatter'
 
 export const listMdxFiles = (paths: string[]) => {
   const allFilesPromises = paths.map(async (path: string) => {
@@ -44,19 +41,4 @@ export const getFilePathBasedOnUrl = (url: string, paths: string[], aliases?: st
   throw new Error(`Path(s) ${finalPaths.join(', ')} were not found on "${url}" url.`)
 }
 
-export const getMdxAttributes = (content: string) => {
-  const { data: attributes } = matter(content)
-
-  return attributes
-}
-
 export const getFileContent = (path: string) => readFile(path, { encoding: 'utf-8' })
-
-export const compileMdx = async (mdxContent: string) => {
-  const compiled = await compile(mdxContent, {
-    outputFormat: 'function-body',
-    remarkPlugins: [remarkFrontmatter],
-  })
-
-  return String(compiled)
-}

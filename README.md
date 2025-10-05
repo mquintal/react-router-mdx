@@ -153,3 +153,19 @@ export default function Route() {
   )
 }
 ```
+
+## Using custom MDX plugins
+
+If you need to extend the basic features of mdx and use custom [plugins](https://mdxjs.com/docs/extending-mdx/#list-of-plugins) you will need to provide it through `options` parameter in our `loadMdx` method.
+
+For example let's say you need [remark-gfm](https://github.com/remarkjs/remark-gfm) in your project. Your route loader method will look like the following:
+
+```ts
+import { loadMdx } from 'react-router-mdx/server'
+import remarkGfm from 'remark-gfm'
+import type { Route } from "./+types/post";
+
+export async function loader({ request }: Route.LoaderArgs) {
+  return loadMdx(request, { remarkPlugins: [remarkGfm] })
+}
+```

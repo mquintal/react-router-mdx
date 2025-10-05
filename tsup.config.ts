@@ -9,7 +9,7 @@ export default defineConfig({
     resolve: true,
   },
   target: "node20",
-  external: ["fs", "path", "@react-router/dev/routes"],
+  external: ["fs", "path", "@react-router/dev/routes", 'virtual:react-router-mdx'],
   splitting: false,
   clean: true,
 });

@@ -3,7 +3,7 @@ import { glob, globSync } from 'glob'
 import matter from 'gray-matter'
 import { resolve, join } from 'path'
 import slash from 'slash'
-import { compile } from '@mdx-js/mdx'
+import { compile, compileSync } from '@mdx-js/mdx'
 import remarkFrontmatter from 'remark-frontmatter'
 
 export const listMdxFiles = (paths: string[]) => {

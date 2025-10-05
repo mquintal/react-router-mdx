@@ -6,7 +6,7 @@ export default defineConfig([
   globalIgnores(["./dist/**"]),
   eslintPluginPrettierRecommended,
   {
-    files: ["src/**/*.ts", "src/**/*.tsx"],
+    files: ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js"],
     languageOptions: {
       parser: tsParser,
     },

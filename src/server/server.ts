@@ -80,19 +80,39 @@ export const routes = (componentPath: string) => {
 }
 
 export const loadMdx = async (request: Request) => {
-  const options = getOptions()
-  const paths = getPaths(options)
-  const aliases = getAliases(options)
-  const path = getFilePathBasedOnUrl(request.url, paths, aliases)
-  const content = await getFileContent(path)
-  const [mdxContent, attributes] = await Promise.all([
-    compileMdx(content),
-    getMdxAttributes(content),
-  ])
+  try {
+    console.log('Checking if you using vite plugin.')
+    // @ts-ignore
+    const test = await import('virtual:react-router-mdx')
+    const { content } = test.getFile(request.url, test.getPaths(), test.getAliases())
 
-  return {
-    __raw: mdxContent,
-    attributes,
+    const [compiled, attributes] = await Promise.all([
+      compileMdx(content),
+      getMdxAttributes(content),
+    ])
+    // @ts-ignore
+    const comp = await import('virtual:hello-world')
+    globalThis.__REACT_ROUTER_MDX_SSR_COMPONENT__ = comp.default
+
+    return {
+      __raw: compiled,
+      attributes,
+    }
+  } catch (e) {
+    console.log('Looks like you are not using vite plugin.')
+    const options = getOptions()
+    const paths = getPaths(options)
+    const aliases = getAliases(options)
+    const path = getFilePathBasedOnUrl(request.url, paths, aliases)
+    const content = await getFileContent(path)
+    const [mdxContent, attributes] = await Promise.all([
+      compileMdx(content),
+      getMdxAttributes(content),
+    ])
+    return {
+      __raw: mdxContent,
+      attributes,
+    }
   }
 }
 
@@ -116,7 +136,7 @@ export const loadAllMdx = async (filterByPaths?: string[]) => {
         const content = await getFileContent(path)
         const attributes = getMdxAttributes(content)
         const [fileName] = path.split('/').reverse()
-        console.log('content ', content, 'attributes ', attributes, 'fileName ', fileName)
+
         return {
           path,
           slug: fileName.replace('.mdx', ''),

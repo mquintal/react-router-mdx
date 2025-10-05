@@ -1,0 +1,1 @@
+export { reactRouterMdx } from './plugin'

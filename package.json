@@ -11,8 +11,9 @@
     "test:server": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.server.js",
     "lint": "eslint . --ext .ts,.tsx",
     "build:client": "vite build",
-    "build:server": "tsup --tsconfig tsconfig.server.json",
-    "build": "npm run build:client && npm run build:server",
+    "build:server": "tsup --tsconfig tsconfig.server.json --config ./tsup.config.ts",
+    "build:vite": "tsup --tsconfig tsconfig.vite.json --config ./tsup.vite.ts && cp src/vite/virtual-state-module.js dist/vite/virtual-state-module.js",
+    "build": "npm run build:client && npm run build:server && npm run build:vite",
     "prepare": "husky",
     "patch": "npm version patch && git push --follow-tags"
   },
@@ -78,6 +79,11 @@
       "import": "./dist/server/index.js",
       "require": "./dist/server/index.cjs",
       "types": "./dist/server/index.d.ts"
+    },
+    "./vite": {
+      "import": "./dist/vite/index.js",
+      "require": "./dist/vite/index.cjs",
+      "types": "./dist/vite/index.d.ts"
     }
   },
   "files": [

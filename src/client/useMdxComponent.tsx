@@ -10,11 +10,20 @@ type MDXComponents = MDXProps['components']
 
 export const useMdxComponent = <T extends MDXComponents>(components?: T) => {
   const { attributes, __raw } = useLoaderData<LoadData>()
-  const { default: Component } = runSync(__raw, { ...runtime, baseUrl: import.meta.url })
 
-  return () => (
-    <MDXProvider>
-      <Component components={components} {...attributes} />
-    </MDXProvider>
-  )
+  if (globalThis.__REACT_ROUTER_MDX_SSR_COMPONENT__) {
+    const Component = globalThis.__REACT_ROUTER_MDX_SSR_COMPONENT__
+    return () => (
+      <MDXProvider>
+        <Component components={components} {...attributes} />
+      </MDXProvider>
+    )
+  } else {
+    const { default: Component } = runSync(__raw, { ...runtime, baseUrl: import.meta.url })
+    return () => (
+      <MDXProvider>
+        <Component components={components} {...attributes} />
+      </MDXProvider>
+    )
+  }
 }
